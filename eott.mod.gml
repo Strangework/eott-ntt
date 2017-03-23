@@ -8,6 +8,7 @@ with (Player) {
 }
 global.curr_area = 10
 global.curr_subarea = 0
+global.player_muts = 0
 Player.last_wep = Player.wep
 Player.last_bwep = Player.bwep
 log_init()
@@ -31,26 +32,37 @@ if (global.log_ready) {
 
 
 #define step
-/*
-with(global) if ("curr_area" not in self) {
-	curr_area = 0
-}
-*/
-/*
-if ("subarea" not in global) {
-	global.curr_subarea = GameCont.subarea
-}
-*/
+
+// End of level logic
 if GameCont.area != global.curr_area or GameCont.subarea != global.curr_subarea {
 	trace("Here we go again!")
+	
+	// Log level change
 	log_write("area:" + string(GameCont.area) + " subarea:" + string(GameCont.subarea))
 	global.curr_area = GameCont.area
 	global.curr_subarea = GameCont.subarea
+
+	// Check for new mutations
+	new_muts = global.player_muts
+	for (i = 0; i < 29; i++) {
+		if (skill_get(i+1)) {
+			new_muts = new_muts | 1 << i
+		}
+	}
+
+	// If there are new mutations, log the change
+	if (global.player_muts != new_muts) {
+		global.player_muts = new_muts
+		log_write("muts:"+string(global.player_muts))
+	}
+
+	// Flush log
 	log_save()
 }
 
+
+
 with (Player) if (button_pressed(index, "swap")) {
-	//Player.is_swapped = !Player.is_swapped
 	//trace("Wapah!")
 }
 
