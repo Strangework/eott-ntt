@@ -8,9 +8,101 @@ with (Player) {
 }
 global.curr_area = 10
 global.curr_subarea = 0
+global.curr_world = get_world(global.curr_area) 
 global.player_muts = 0
 Player.last_wep = Player.wep
 Player.last_bwep = Player.bwep
+
+// List of every mean motherfucker in this game
+// Desert
+global.DesertBaddies[0] = RadMaggot
+global.DesertBaddies[1] = GoldScorpion
+global.DesertBaddies[2] = MaggotSpawn
+global.DesertBaddies[3] = BigMaggot
+global.DesertBaddies[4] = Maggot
+global.DesertBaddies[5] = Scorpion
+global.DesertBaddies[6] = Bandit
+
+// Sewers
+global.SewerBaddies[0] = SuperFrog
+global.SewerBaddies[1] = Gator
+global.SewerBaddies[2] = BuffGator
+global.SewerBaddies[3] = Ratking
+global.SewerBaddies[4] = Rat
+global.SewerBaddies[5] = FastRat
+global.SewerBaddies[6] = MeleeBandit
+global.SewerBaddies[7] = Turtle
+
+// Scrapyard
+global.ScrapyardBaddies[0] = Sniper
+global.ScrapyardBaddies[1] = Raven
+global.ScrapyardBaddies[2] = Salamander
+
+
+// Crystal caves
+global.CrystalCavesBaddies[0] = Spider
+global.CrystalCavesBaddies[1] = LaserCrystal
+global.CrystalCavesBaddies[2] = LightningCrystal
+
+/*
+// Frozen city
+        SnowTank
+        GoldSnowTank
+        SnowBot
+        CarThrow
+        Wolf
+// Labs
+        RhinoFreak
+        Freak
+        Turret
+        ExploFreak
+        Necromancer
+// Palace
+        ExploGuardian
+        DogGuardian
+        GhostGuardian
+        Guardian
+// Mansion
+        Molefish
+        FireBaller
+        SuperFireBaller
+        Jock
+        Molesarge
+// IDPD
+        Van
+        PopoFreak
+        Grunt
+        EliteGrunt
+        Shielder
+        EliteShielder
+        Inspector
+        EliteInspector
+// Oasis
+        Crab
+        BoneFish
+// Jungle
+        JungleAssassin
+        JungleFly
+        JungleBandit
+// Other
+        EnemyHorror
+        crystaltype
+        hitme
+        PotentialYeti
+        Corpse
+        ScrapBossCorpse
+        Nothing2Corpse
+        InvLaserCrystal
+        InvSpider
+        CrownGuardianOld
+        CrownGuardian
+        OldGuardianStatue
+        GuardianStatue
+        GuardianDeflect
+        Mimic
+        SuperMimic
+*/
+
 log_init()
 
 #define log_init
@@ -32,6 +124,17 @@ if (global.log_ready) {
 
 
 #define step
+
+// Check for enemy deaths
+for (i=0; i<array_length_1d(global.DesertBaddies); i++) {
+	with(global.DesertBaddies[i]){
+		if (my_health <= -20) {
+			trace("O FUQ!")
+		} else if (my_health <= 0) {
+			trace("bleh!")
+		}
+	}
+}
 
 // End of level logic
 if GameCont.area != global.curr_area or GameCont.subarea != global.curr_subarea {
@@ -91,3 +194,9 @@ if Player.is_swapped {
 } else {
 	return Player.bwep
 }
+
+#define get_world(area)
+switch(area) {
+	case 1: return 
+}
+	
