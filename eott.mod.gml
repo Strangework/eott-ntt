@@ -93,6 +93,7 @@ global.curr_subarea = 0
 global.baddies = []
 global.player_muts = 0
 global.player_initialized = false // Player initialization is not possible until the player entity is (re)created. Initialization occurs within a conditional block in step()
+global.kill_map = ds_map_create()
 
 log_init()
 
@@ -128,10 +129,14 @@ if (!global.player_initialized and instance_exists(Player)) {
 // Check for enemy deaths
 for (i=0; i<array_length_1d(global.baddies); i++) {
 	with(global.baddies[i]){
+		var name = object_get_name(object_index)
 		if (my_health <= -20) {
+			// TODO : Set overkill threshold
 			trace("O FUQ!")
+			global.kill_map[? name] = global.kill_map[? name] + 1
 		} else if (my_health <= 0) {
-			trace("bleh!")
+			trace("bleh! " + name)
+			global.kill_map[? name] = global.kill_map[? name] + 1
 		}
 	}
 }
@@ -145,8 +150,22 @@ if GameCont.area != global.curr_area or GameCont.subarea != global.curr_subarea 
 	global.curr_area = GameCont.area
 	global.curr_subarea = GameCont.subarea
 
+	// Log kills
+	//log_write("killmap:" +ds_map_write(global.kill_map))
+
 	// Update enemy list
 	global.baddies = get_baddie_list(global.curr_area)
+
+	// Create new kill map
+	// TODO : Find a more reliable value to be used as a key! Instantiating the map before the level loads means that the objects are unavailable, so deriving their names from their object IDs doesn't work
+	ds_map_destroy(global.kill_map)
+	global.kill_map = ds_map_create()
+	for (i=0; i<array_length_1d(global.baddies); i++) {
+		with(global.baddies[i]) {
+			trace("WRITING " + object_get_name(object_index))
+			global.kill_map[? object_get_name(object_index)] = 0
+		}
+	}
 
 	// Check for new mutations
 	new_muts = global.player_muts
