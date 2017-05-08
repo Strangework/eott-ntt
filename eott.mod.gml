@@ -1,19 +1,15 @@
 #define init
-trace("Aw yiss")
-trace("I'm into it, man")
-with (Player) {
-	is_swapped = false
-	global.last_wep = wep
-	global.last_bwep = bwep
-}
-global.curr_area = 10
-global.curr_subarea = 0
-global.curr_world = get_world(global.curr_area) 
-global.player_muts = 0
-Player.last_wep = Player.wep
-Player.last_bwep = Player.bwep
-
 // List of every mean motherfucker in this game
+
+// Miscellaneous (aren't specific to an area)
+global.MiscBaddies[0] = Bandit
+global.MiscBaddies[1] = Gator
+global.MiscBaddies[2] = EnemyHorror
+global.MiscBaddies[3] = CrownGuardian
+global.MiscBaddies[4] = Mimic
+global.MiscBaddies[5] = SuperMimic
+global.SewerBaddies[6] = MeleeBandit
+
 // Desert
 global.DesertBaddies[0] = RadMaggot
 global.DesertBaddies[1] = GoldScorpion
@@ -21,89 +17,85 @@ global.DesertBaddies[2] = MaggotSpawn
 global.DesertBaddies[3] = BigMaggot
 global.DesertBaddies[4] = Maggot
 global.DesertBaddies[5] = Scorpion
-global.DesertBaddies[6] = Bandit
 
 // Sewers
 global.SewerBaddies[0] = SuperFrog
-global.SewerBaddies[1] = Gator
-global.SewerBaddies[2] = BuffGator
-global.SewerBaddies[3] = Ratking
-global.SewerBaddies[4] = Rat
-global.SewerBaddies[5] = FastRat
-global.SewerBaddies[6] = MeleeBandit
-global.SewerBaddies[7] = Turtle
+global.SewerBaddies[1] = BuffGator
+global.SewerBaddies[2] = Ratking
+global.SewerBaddies[3] = Rat
+global.SewerBaddies[4] = FastRat
+global.SewerBaddies[5] = Turtle
 
 // Scrapyard
 global.ScrapyardBaddies[0] = Sniper
 global.ScrapyardBaddies[1] = Raven
 global.ScrapyardBaddies[2] = Salamander
 
-
 // Crystal caves
 global.CrystalCavesBaddies[0] = Spider
 global.CrystalCavesBaddies[1] = LaserCrystal
 global.CrystalCavesBaddies[2] = LightningCrystal
 
-/*
 // Frozen city
-        SnowTank
-        GoldSnowTank
-        SnowBot
-        CarThrow
-        Wolf
+global.FrozenCityBaddies[0] = SnowTank
+global.FrozenCityBaddies[1] = GoldSnowTank
+global.FrozenCityBaddies[2] = SnowBot
+global.FrozenCityBaddies[3] = Wolf
+
 // Labs
-        RhinoFreak
-        Freak
-        Turret
-        ExploFreak
-        Necromancer
+global.LabsBaddies[0] = RhinoFreak
+global.LabsBaddies[1] = Freak
+global.LabsBaddies[2] = Turret
+global.LabsBaddies[3] = ExploFreak
+global.LabsBaddies[4] = Necromancer
+
 // Palace
-        ExploGuardian
-        DogGuardian
-        GhostGuardian
-        Guardian
+global.PalaceBaddies[0] = ExploGuardian
+global.PalaceBaddies[1] = DogGuardian
+global.PalaceBaddies[2] = GhostGuardian
+global.PalaceBaddies[3] = Guardian
+
 // Mansion
-        Molefish
-        FireBaller
-        SuperFireBaller
-        Jock
-        Molesarge
+global.MansionBaddies[0] = Molefish
+global.MansionBaddies[1] = FireBaller
+global.MansionBaddies[2] = SuperFireBaller
+global.MansionBaddies[3] = Jock
+global.MansionBaddies[4] = Molesarge
+
 // IDPD
-        Van
-        PopoFreak
-        Grunt
-        EliteGrunt
-        Shielder
-        EliteShielder
-        Inspector
-        EliteInspector
+global.PopoBaddies[0] = Van
+global.PopoBaddies[1] = PopoFreak
+global.PopoBaddies[2] = Grunt
+global.PopoBaddies[3] = EliteGrunt
+global.PopoBaddies[4] = Shielder
+global.PopoBaddies[5] = EliteShielder
+global.PopoBaddies[6] = Inspector
+global.PopoBaddies[7] = EliteInspector
+
 // Oasis
-        Crab
-        BoneFish
+global.OasisBaddies[0] = Crab
+global.OasisBaddies[1] = BoneFish
+
 // Jungle
-        JungleAssassin
-        JungleFly
-        JungleBandit
-// Other
-        EnemyHorror
-        crystaltype
-        hitme
-        PotentialYeti
-        Corpse
-        ScrapBossCorpse
-        Nothing2Corpse
-        InvLaserCrystal
-        InvSpider
-        CrownGuardianOld
-        CrownGuardian
-        OldGuardianStatue
-        GuardianStatue
-        GuardianDeflect
-        Mimic
-        SuperMimic
-*/
+global.JungleBaddies[0] = JungleAssassin
+global.JungleBaddies[1] = JungleFly
+global.JungleBaddies[2] = JungleBandit
+
+
+trace("Aw yiss")
+with (Player) {
+	is_swapped = false
+	global.last_wep = wep
+	global.last_bwep = bwep
+}
+global.curr_area = 10
+global.curr_subarea = 0
+global.baddies = []
+global.player_muts = 0
+global.player_initialized = false // Player initialization is not possible until the player entity is (re)created. Initialization occurs within a conditional block in step()
 
 log_init()
+
 
 #define log_init
 global.log = ""
@@ -112,6 +104,7 @@ global.log_file = "nt_monitor.log"
 global.log_ready = false
 wait file_load(global.log_file)
 global.log_ready = true
+
 
 #define log_write(line)
 global.log = global.log + line + "#"
@@ -125,9 +118,16 @@ if (global.log_ready) {
 
 #define step
 
+// Perform any one-time player initializations
+if (!global.player_initialized and instance_exists(Player)) {
+	Player.last_wep = Player.wep
+	Player.last_bwep = Player.bwep
+	global.player_initialized = true
+}
+
 // Check for enemy deaths
-for (i=0; i<array_length_1d(global.DesertBaddies); i++) {
-	with(global.DesertBaddies[i]){
+for (i=0; i<array_length_1d(global.baddies); i++) {
+	with(global.baddies[i]){
 		if (my_health <= -20) {
 			trace("O FUQ!")
 		} else if (my_health <= 0) {
@@ -144,6 +144,9 @@ if GameCont.area != global.curr_area or GameCont.subarea != global.curr_subarea 
 	log_write("area:" + string(GameCont.area) + " subarea:" + string(GameCont.subarea))
 	global.curr_area = GameCont.area
 	global.curr_subarea = GameCont.subarea
+
+	// Update enemy list
+	global.baddies = get_baddie_list(global.curr_area)
 
 	// Check for new mutations
 	new_muts = global.player_muts
@@ -195,8 +198,35 @@ if Player.is_swapped {
 	return Player.bwep
 }
 
-#define get_world(area)
-switch(area) {
-	case 1: return 
+#define get_baddie_list(area)
+// TODO : Add looping logic
+switch (area) {
+	case 1:
+		return concatenate_1d_arrays(global.DesertBaddies, global.MiscBaddies)
+		break
+	case 2:
+		return concatenate_1d_arrays(global.SewerBaddies, global.MiscBaddies)
+		break
+	case 3:
+		return concatenate_1d_arrays(global.ScrapyardBaddies, global.MiscBaddies)
+		break
+	case 4:
+		return concatenate_1d_arrays(global.CrystalCavesBaddies, global.MiscBaddies)
+		break
+	case 5:
+		return concatenate_1d_arrays(global.FrozenCityBaddies, global.MiscBaddies)
+		break
+	case 6:
+		return concatenate_1d_arrays(global.LabsBaddies, global.MiscBaddies)
+		break
+	case 7:
+		return concatenate_1d_arrays(global.PalaceBaddies, global.MiscBaddies)
+		break
+} 
+
+#define concatenate_1d_arrays(x, y)
+z = x
+for (i=0; i < array_length_1d(y); i++) {
+	z[i+array_length_1d(x)+1] = y[i]
 }
-	
+return z
